@@ -29,13 +29,20 @@ all this in 51.68 mm * 19.94 mm
 
 
 main water level detection is via Maxbotic ultrasonic sensor or china clone
+
 submerged water level is via LPS28DFW   1meter water = 9.78kPa or 1.42PSI
+
 ice melt is via a simple rock on the ice the tie to a magnet via a fish line
+
 when ice melt rock shink and pull the magmet so it trig the magmetic reed switch
+
 a provision is made on the PCB for put sensor power OFF when magnet is present for keep battery live over the winter
 
+
 solar charger is in developmemt and come soon
+
 same for turbidity sensor , by use of low-cost dish-washer sensor
+
 
 receiver side is adafruit Adafruit Feather 32u4 RFM95 LoRa Radio- 868 or 915 MHz
 combined to Adafruit Feather HUZZAH with ESP8266 - Loose Headers
