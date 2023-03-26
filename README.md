@@ -34,6 +34,7 @@ TX pin of Feather 32u4 go to RX pin of Feather HUZZAH
 server side is plain web service hosting whit a FTP server  ,create a dedicated FTP accont on a WWW accesible folder  and copy the .php file to it
 
 live exemple :
+
 http://www.alphatronique.com/lora_sensor/mesure.php    <- real time sensor value
 
 http://www.alphatronique.com/lora_sensor/donnes.txt    <- sensor data history
