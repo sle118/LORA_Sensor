@@ -45,7 +45,7 @@ same for turbidity sensor , by use of low-cost dish-washer sensor
 
 
 receiver side is adafruit Adafruit Feather 32u4 RFM95 LoRa Radio- 868 or 915 MHz
-combined to Adafruit Feather HUZZAH with ESP8266 - Loose Headers
+combined to Adafruit Feather HUZZAH with ESP8266 
 both board is stacked whit GND and USB pin connected togeter
 TX pin of Feather 32u4 go to RX pin of Feather HUZZAH
 
