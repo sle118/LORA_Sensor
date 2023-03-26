@@ -5,17 +5,28 @@ sensor is desin to be small and fit inside PVC "T" and have long battery live
  great versatility and hackability
 
 1-)based arond SAMD21G17 CPU and arduino commpatible
+
 2-)long range LORA FCC certified radio module (up to 10KM)
+
 3-)over 60 day on a singel 18650 3.6 litium cell (optional solar charger)
+
 4-)mesure up to 10meter whit 1cm accuracy or 5meter whit 1mm accuracy
+
 5-)magetic reed switch for detection of ice covert melt
+
 6-)barometric presure and temperature sensor
+
 7-)provision for water level and temperature detection via sumerged sensor
+
 8-)provision for turbidity sensor
+
 9-)RS-485 for add custom sensor
+
 10-)user programable GPIO
 
+
 all this in 51.68 mm * 19.94 mm
+
 
 main water level detection is via Maxbotic ultrasonic sensor or china clone
 submerged water level is via LPS28DFW   1meter water = 9.78kPa or 1.42PSI
