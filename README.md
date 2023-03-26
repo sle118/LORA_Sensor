@@ -8,7 +8,7 @@ sensor is desin to be small and fit inside PVC "T" and have long battery live
 
 2-)long range LORA FCC certified radio module (up to 10KM)
 
-3-)over 60 day on a singel 18650 3.6 litium cell (optional solar charger)
+3-)over 60 day on a singel 18650 3.6V litium cell (optional solar charger)
 
 4-)mesure up to 10meter whit 1cm accuracy or 5meter whit 1mm accuracy
 
