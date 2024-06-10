@@ -1,0 +1,83 @@
+# LoRa Sensor Arduino Project Setup
+
+This guide provides detailed instructions on how to configure your Arduino environment to use custom board definitions necessary for the LoRa Sensor project, particularly for the `Alphatronique LoRa Sensor (SAMD21)` board, which is compatible with the Adafruit Feather M0.
+
+## Prerequisites
+
+- Arduino IDE installed on your computer.
+- Access to the GitHub repository where the project is hosted.
+
+## Custom Board Definitions
+
+The project uses specific hardware definitions that are not included in the standard Arduino IDE. These definitions are crucial for compiling the transmitter sketch correctly.
+
+### Steps to Install Custom Hardware Definitions
+
+1. **Clone the Repository:**
+   Start by cloning the LoRa_Sensor repository to your local machine. Ensure you have Git installed or download the ZIP file directly from GitHub.
+
+    ```bash
+    git clone https://github.com/yourusername/LoRa_Sensor.git
+    ```
+
+2. **Locate the Hardware Definitions:**
+   Navigate to the `transmitter/Sensor_firmware` directory within the cloned repository. Here, you will find a folder named `hardware` containing the board definitions for `Alphatronique LoRa Sensor (SAMD21)`.
+
+3. **Copy the Hardware Folder:**
+   You need to copy this `hardware` folder into your Arduino directory where additional board definitions are stored.
+
+    ### For Windows:
+    Copy the `hardware` folder to the following location:
+
+    ```plaintext
+    C:\Users\<YourUsername>\Documents\Arduino\hardware
+    ```
+
+    If the `hardware` folder does not exist, create it.
+
+    ### For macOS and Linux:
+    Copy the `hardware` folder to:
+
+    ```plaintext
+    ~/Documents/Arduino/hardware
+    ```
+
+    If the `hardware` folder does not exist, create it.
+
+4. **Restart Arduino IDE:**
+   Close and reopen your Arduino IDE after copying the files. This will prompt the IDE to reload all available board definitions.
+
+5. **Select the Custom Board:**
+   Go to `Tools > Board` in the Arduino IDE, and you should now see `Alphatronique LoRa Sensor (SAMD21)` listed under the custom boards. Select this board for compiling the transmitter sketch.
+
+## Compiling and Uploading the Sketch
+
+Once the board definitions are set up, open the transmitter sketch from the `LoRa_Sensor` project and verify/update any necessary configurations specific to your setup. Compile and upload the sketch to your Alphatronique LoRa Sensor board.
+
+## Troubleshooting
+
+If you encounter issues with the Arduino IDE not recognizing the custom board, ensure the `hardware` folder is correctly placed and contains all required files. Sometimes, a second restart of the Arduino IDE or a reinstallation of the Arduino IDE might be necessary.
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Sebastien Leclerc
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,0 +1,4 @@
+name=Alphatronique SAMD (32-bits ARM Cortex-M0+ and Cortex-M4) Boards
+version=1.7.14
+
+

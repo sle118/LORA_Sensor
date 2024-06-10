@@ -1,0 +1,178 @@
+menu.opt=Optimize
+menu.usbstack=USB Stack
+menu.debug=Debug
+menu.deep_sleep=Deep Sleep
+menu.maxbotix_sensor=Maxbotix Sensor
+
+
+# -----------------------------------
+# Alphatronique LORA_v1.0A (SAMD21)
+# -----------------------------------
+alphatronique_lora_v1A.name=Alphatronique Lora Sensor (SAMD21) 
+
+# VID/PID for Bootloader, Arduino & CircuitPython
+alphatronique_lora_v1A.vid.0=0x239A
+alphatronique_lora_v1A.pid.0=0x800B
+alphatronique_lora_v1A.vid.1=0x239A
+alphatronique_lora_v1A.pid.1=0x000B
+alphatronique_lora_v1A.vid.2=0x239A
+alphatronique_lora_v1A.pid.2=0x0015
+
+# Upload
+alphatronique_lora_v1A.upload.tool=bossac18
+alphatronique_lora_v1A.upload.protocol=sam-ba
+alphatronique_lora_v1A.upload.maximum_size=262144
+alphatronique_lora_v1A.upload.offset=0x2000
+alphatronique_lora_v1A.upload.use_1200bps_touch=true
+alphatronique_lora_v1A.upload.wait_for_upload_port=true
+alphatronique_lora_v1A.upload.native_usb=true
+
+# Build
+alphatronique_lora_v1A.build.mcu=cortex-m0plus
+alphatronique_lora_v1A.build.f_cpu=48000000L
+alphatronique_lora_v1A.build.usb_product="Lora V1"
+alphatronique_lora_v1A.build.ds_flag=
+alphatronique_lora_v1A.build.usb_manufacturer="Alphatronique"
+alphatronique_lora_v1A.build.board=SAMD_ZERO
+alphatronique_lora_v1A.build.core=adafruit:arduino
+alphatronique_lora_v1A.build.extra_flags=-D__SAMD21G18A__ -DADAFRUIT_FEATHER_M0 -DALPHATRONIQUE_LORAV -DARDUINO_SAMD_ZERO -DARM_MATH_CM0PLUS {build.at_usb_flags} {build.ds_flag} -DPULSE_SCALE_MS_PER_CM={build.mx_us_per_cm}
+alphatronique_lora_v1A.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+alphatronique_lora_v1A_jlink.build.openocdscript=scripts/openocd/daplink_samd21.cfg
+alphatronique_lora_v1A.build.variant=lora_v1
+alphatronique_lora_v1A.build.variant_system_lib=
+alphatronique_lora_v1A.build.vid=0x239A
+alphatronique_lora_v1A.build.pid=0x800B
+alphatronique_lora_v1A.bootloader.tool=adafruit:openocd
+alphatronique_lora_v1A.bootloader.file=featherM0/bootloader-feather_m0-v2.0.0-adafruit.5.bin
+
+
+
+
+
+# Menu: Optimization
+alphatronique_lora_v1A.menu.opt.small=Small (-Os) (standard)
+alphatronique_lora_v1A.menu.opt.small.build.flags.optimize=-Os
+alphatronique_lora_v1A.menu.opt.fast=Fast (-O2)
+alphatronique_lora_v1A.menu.opt.fast.build.flags.optimize=-O2
+alphatronique_lora_v1A.menu.opt.faster=Faster (-O3)
+alphatronique_lora_v1A.menu.opt.faster.build.flags.optimize=-O3
+alphatronique_lora_v1A.menu.opt.fastest=Fastest (-Ofast)
+alphatronique_lora_v1A.menu.opt.fastest.build.flags.optimize=-Ofast
+alphatronique_lora_v1A.menu.opt.dragons=Here be dragons (-Ofast -funroll-loops)
+alphatronique_lora_v1A.menu.opt.dragons.build.flags.optimize=-Ofast -funroll-loops
+
+# Menu: USB Stack
+alphatronique_lora_v1A.menu.usbstack.arduino=Arduino
+alphatronique_lora_v1A.menu.usbstack.tinyusb=TinyUSB
+alphatronique_lora_v1A.menu.usbstack.tinyusb.build.flags.usbstack=-DUSE_TINYUSB
+
+# Menu: Debug
+alphatronique_lora_v1A.menu.debug.off=Off
+alphatronique_lora_v1A.menu.debug.on=On
+alphatronique_lora_v1A.menu.debug.on.build.flags.debug=-g
+
+# Menu: Deep Sleep
+alphatronique_lora_v1A.menu.deep_sleep.enable=Enable
+alphatronique_lora_v1A.menu.deep_sleep.disable=Disable
+alphatronique_lora_v1A.menu.deep_sleep.enable.build.ds_flag=-DDEEP_SLEEP_ENABLE
+
+alphatronique_lora_v1A.menu.maxbotix_sensor.lv_maxsonar=LV-MaxSonar (MB1000, MB1010, MB1020, MB1030, MB1040)
+alphatronique_lora_v1A.menu.maxbotix_sensor.xl_maxsonar=XL-MaxSonar (MB7051, MB7052, MB7053, MB7054, MB7060, MB7062, MB7066)
+alphatronique_lora_v1A.menu.maxbotix_sensor.hr_maxsonar=HR-MaxSonar (MB7051, MB7052, MB7053, MB7054, MB7060, MB7062, MB7066)
+alphatronique_lora_v1A.menu.maxbotix_sensor.autocal=Auto Calibrate (Distance <= 1M at first power on after flashing)
+alphatronique_lora_v1A.menu.maxbotix_sensor.lv_maxsonar.build.mx_us_per_cm=(double)(147.0/2.54)
+alphatronique_lora_v1A.menu.maxbotix_sensor.xl_maxsonar.build.mx_us_per_cm=(double)(58.0)
+alphatronique_lora_v1A.menu.maxbotix_sensor.hr_maxsonar.build.mx_us_per_cm=(double)(10.0)
+alphatronique_lora_v1A.menu.maxbotix_sensor.autocal.build.mx_us_per_cm=(double)(-1)
+
+
+# USB Flags
+# ---------
+alphatronique_lora_v1A.build.at_usb_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSBCON -DUSB_CONFIG_POWER={build.usb_power} '-DUSB_MANUFACTURER={build.usb_manufacturer}' '-DUSB_PRODUCT={build.usb_product}' {build.flags.usbstack} {build.flags.debug} "-I{build.core.path}/../../libraries/Adafruit_TinyUSB_Arduino/src/arduino"
+
+
+# -----------------------------------
+# Alphatronique LORA_v1.0A (SAMD21)
+# -----------------------------------
+alphatronique_lora_v1A_jlink.name=Alphatronique Lora Sensor (SAMD21 on jlink)
+
+# VID/PID for Bootloader, Arduino & CircuitPython
+alphatronique_lora_v1A_jlink.vid.0=0x239A
+alphatronique_lora_v1A_jlink.pid.0=0x800B
+alphatronique_lora_v1A_jlink.vid.1=0x239A
+alphatronique_lora_v1A_jlink.pid.1=0x000B
+alphatronique_lora_v1A_jlink.vid.2=0x239A
+alphatronique_lora_v1A_jlink.pid.2=0x0015
+
+# Upload
+alphatronique_lora_v1A_jlink.upload.tool=bossac18
+alphatronique_lora_v1A_jlink.upload.protocol=sam-ba
+alphatronique_lora_v1A_jlink.upload.maximum_size=262144
+alphatronique_lora_v1A_jlink.upload.offset=0x2000
+alphatronique_lora_v1A_jlink.upload.use_1200bps_touch=true
+alphatronique_lora_v1A_jlink.upload.wait_for_upload_port=true
+alphatronique_lora_v1A_jlink.upload.native_usb=true
+
+# Build
+alphatronique_lora_v1A_jlink.build.mcu=cortex-m0plus
+alphatronique_lora_v1A_jlink.build.f_cpu=48000000L
+alphatronique_lora_v1A_jlink.build.usb_product="Lora V1"
+alphatronique_lora_v1A_jlink.build.ds_flag=
+
+alphatronique_lora_v1A_jlink.build.usb_manufacturer="Alphatronique"
+alphatronique_lora_v1A_jlink.build.board=SAMD_ZERO
+alphatronique_lora_v1A_jlink.build.core=adafruit:arduino
+alphatronique_lora_v1A_jlink.build.extra_flags=-D__SAMD21G18A__ -DADAFRUIT_FEATHER_M0 -DALPHATRONIQUE_LORAV -DARDUINO_SAMD_ZERO -DARM_MATH_CM0PLUS {build.at_usb_flags} {build.ds_flag} -DPULSE_SCALE_MS_PER_CM={build.mx_us_per_cm}
+alphatronique_lora_v1A_jlink.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+alphatronique_lora_v1A_jlink.build.openocdscript=scripts/openocd/jlink_samd21.cfg
+alphatronique_lora_v1A_jlink.build.variant=lora_v1
+alphatronique_lora_v1A_jlink.build.variant_system_lib=
+alphatronique_lora_v1A_jlink.build.vid=0x239A
+alphatronique_lora_v1A_jlink.build.pid=0x800B
+alphatronique_lora_v1A_jlink.bootloader.tool=adafruit:openocd
+alphatronique_lora_v1A_jlink.bootloader.file=featherM0/bootloader-feather_m0-v2.0.0-adafruit.5.bin
+
+
+
+
+
+# Menu: Optimization
+alphatronique_lora_v1A_jlink.menu.opt.small=Small (-Os) (standard)
+alphatronique_lora_v1A_jlink.menu.opt.small.build.flags.optimize=-Os
+alphatronique_lora_v1A_jlink.menu.opt.fast=Fast (-O2)
+alphatronique_lora_v1A_jlink.menu.opt.fast.build.flags.optimize=-O2
+alphatronique_lora_v1A_jlink.menu.opt.faster=Faster (-O3)
+alphatronique_lora_v1A_jlink.menu.opt.faster.build.flags.optimize=-O3
+alphatronique_lora_v1A_jlink.menu.opt.fastest=Fastest (-Ofast)
+alphatronique_lora_v1A_jlink.menu.opt.fastest.build.flags.optimize=-Ofast
+alphatronique_lora_v1A_jlink.menu.opt.dragons=Here be dragons (-Ofast -funroll-loops)
+alphatronique_lora_v1A_jlink.menu.opt.dragons.build.flags.optimize=-Ofast -funroll-loops
+
+# Menu: USB Stack
+alphatronique_lora_v1A_jlink.menu.usbstack.arduino=Arduino
+alphatronique_lora_v1A_jlink.menu.usbstack.tinyusb=TinyUSB
+alphatronique_lora_v1A_jlink.menu.usbstack.tinyusb.build.flags.usbstack=-DUSE_TINYUSB
+
+# Menu: Debug
+alphatronique_lora_v1A_jlink.menu.debug.off=Off
+alphatronique_lora_v1A_jlink.menu.debug.on=On
+alphatronique_lora_v1A_jlink.menu.debug.on.build.flags.debug=-g
+
+# Menu: Deep Sleep
+alphatronique_lora_v1A_jlink.menu.deep_sleep.enable=Enable
+alphatronique_lora_v1A_jlink.menu.deep_sleep.disable=Disable
+alphatronique_lora_v1A_jlink.menu.deep_sleep.enable.build.ds_flag=-DDEEP_SLEEP_ENABLE
+
+alphatronique_lora_v1A_jlink.menu.maxbotix_sensor.lv_maxsonar=LV-MaxSonar (MB1000, MB1010, MB1020, MB1030, MB1040)
+alphatronique_lora_v1A_jlink.menu.maxbotix_sensor.xl_maxsonar=XL-MaxSonar (MB7051, MB7052, MB7053, MB7054, MB7060, MB7062, MB7066)
+alphatronique_lora_v1A_jlink.menu.maxbotix_sensor.hr_maxsonar=HR-MaxSonar (MB7051, MB7052, MB7053, MB7054, MB7060, MB7062, MB7066)
+alphatronique_lora_v1A_jlink.menu.maxbotix_sensor.lv_maxsonar.build.mx_us_per_cm=(double)(147.0/2.54)
+alphatronique_lora_v1A_jlink.menu.maxbotix_sensor.xl_maxsonar.build.mx_us_per_cm=(double)(58.0)
+alphatronique_lora_v1A_jlink.menu.maxbotix_sensor.hr_maxsonar.build.mx_us_per_cm=(double)(10.0)
+
+
+
+
+# USB Flags
+# ---------
+alphatronique_lora_v1A_jlink.build.at_usb_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} -DUSBCON -DUSB_CONFIG_POWER={build.usb_power} '-DUSB_MANUFACTURER={build.usb_manufacturer}' '-DUSB_PRODUCT={build.usb_product}' {build.flags.usbstack} {build.flags.debug} "-I{build.core.path}/../../libraries/Adafruit_TinyUSB_Arduino/src/arduino"

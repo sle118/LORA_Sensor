@@ -1,0 +1,100 @@
+# LoRa Receiver Arduino Project
+
+This project implements a LoRa receiver using an ESP32 module to receive data from a LoRa transmitter and log it to a Google Spreadsheet via a deployed Google Apps Script web app. The code uses a combination of libraries and custom configurations to manage the network connection and data processing.
+
+## Prerequisites
+
+- **Arduino IDE**: Ensure you have the latest version of Arduino IDE installed.
+- **ESP32 Board Package**: Install the ESP32 board package in the Arduino IDE (via Board Manager), using version 2.x.x. If your receiver board has a 40MHz crystal, then only you can use V3.x.x.
+- **Libraries**: The following libraries need to be installed from the Arduino Library Manager:
+  - `Adafruit_GFX` by Adafruit
+  - `Adafruit_SSD1306` by Adafruit
+  - `ArduinoJson` by Benoit Blanchon
+  - `RadioHead` by Mike McCauley - as of writing this, only the ESP32 board V2.x.x is supported
+  - `WiFiManager` by tzapu
+  - `LoRa Serialization` by Joscha Feth 
+
+
+## Folder Structure
+
+Ensure that the folder structure from the GitHub repository is preserved as the project uses common definitions and configuration header files (`Definitions.h`, `Configuration.h`) shared between the transmitter and receiver. This is crucial for aligning data and radio correctly across both the transmitter and receiver.
+
+### Setting Up Symbolic Links
+
+If the symlinks are not already set up or are not properly propagated after cloning the repository, follow these steps to create them manually from the root of the project:
+
+#### For Windows:
+1. Open Command Prompt as Administrator.
+2. Navigate to the root of the project (where you cloned the repository).
+3. Execute the following commands:
+    ```sh
+    mklink Receiver\TTGO_LoraV1\Definitions.h transmitter\Sensor_firmware\Feather9x_TX\Definitions.h
+    mklink Receiver\TTGO_LoraV1\Configuration.h transmitter\Sensor_firmware\Feather9x_TX\Configuration.h
+    ```
+
+#### For Linux or macOS:
+1. Open Terminal.
+2. Navigate to the root of the project (where you cloned the repository).
+3. Execute the following commands:
+    ```sh
+    ln -s ../transmitter/Sensor_firmware/Feather9x_TX/Definitions.h Receiver/TTGO_LoraV1/Definitions.h
+    ln -s ../transmitter/Sensor_firmware/Feather9x_TX/Configuration.h Receiver/TTGO_LoraV1/Configuration.h
+    ```
+
+Ensure that these commands are executed at the project root level to correctly set up the paths.
+
+
+## Configuration
+
+Before compiling and uploading the firmware to your ESP32 device, update the following parameters in the code to match your setup:
+
+- **Google Script Deployment ID** and **Document ID**: These can be obtained from the setup of the Google Apps Script linked to your Google Spreadsheet as described in the Google Apps Script README (`GoogleScript/README`).
+- **WiFi Credentials**: Set up initially via the WiFiManager portal that pops up automatically when no WiFi connection can be established.
+- **LoRa Configuration**: Ensure the frequency and mode match those of your LoRa transmitter by reviewing header file `transmitter/Sendor_firmware/Feather9x_TX/Configuration.h`.
+
+### Updating Certificates
+
+In case the root certificate for `script.google.com` expires or needs updating, follow these steps:
+1. In Chrome, navigate to `script.google.com`.
+2. Click on the padlock icon in the address bar, then click on `Certificate`.
+3. Navigate to the `Details` tab and export the certificate.
+4. Replace the existing certificate in your Arduino code with the new one and/or activate the portal (see below) and update the certificate from the configuration page.
+
+### Manual Control Over WiFi Configuration Portal
+
+The WiFi configuration portal can be manually triggered by pressing the "PRG" button on the ESP32 board (mapped to GPIO0). This allows for on-demand reconfiguration of network settings.
+
+## Compiling and Uploading
+
+1. Open the Arduino IDE and select the `ESP32 Dev Module` as your board.
+2. Set the serial port to the one that corresponds to your ESP32 module.
+3. Adjust the `SERIAL_CONSOLE_SPEED` if necessary to match your debugging preference.
+4. Compile and upload the code to your ESP32.
+
+## Operation
+
+Once deployed, the ESP32 will listen for LoRa transmissions and log received data to your specified Google Spreadsheet. The code also uses the display to show live data and transmit status. Ensure your LoRa transmitter is operational and configured to send data at the expected frequency and settings.
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Sebastien Leclerc
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

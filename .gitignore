@@ -1,0 +1,10 @@
+transmitter/build/
+transmitter/Sensor_firmware/Feather9x_TX/Sensor_firmware.code-workspace
+transmitter/Sensor_firmware/.vscode/c_cpp_properties.json
+transmitter/Sensor_firmware/.vscode/arduino.json
+.vscode/c_cpp_properties.json
+transmitter/Sensor_firmware/hardware/Alphatronique/samd/scripts/jlink/samd51/debug_custom.json
+transmitter/Sensor_firmware/hardware/Alphatronique/samd/scripts/jlink/samd21/debug_custom.json
+transmitter/Sensor_firmware/Feather9x_TX/.theia/launch.json
+.vscode/arduino.json
+transmitter/Sensor_firmware/Feather9x_TX/.vscode/.cortex-debug.registers.state.json
