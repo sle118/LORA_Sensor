@@ -226,8 +226,6 @@ void setup() {
   setCpuFrequencyMhz(240);
   Serial.begin(SERIAL_CONSOLE_SPEED);
   
-  
-
 
   auto upto = millis()+2000;
   while(!Serial && millis()<upto){}
@@ -763,8 +761,6 @@ void prepareAndSendData(measurements_t* measures, int snr) {
   json["duration"] = measures->duration;
   json["temperature"] = measures->temperature;
   json["internal_temp"] = measures->internal_temp;
-  json["internal_voltage"] = measures->internal_voltage;
-  json["core_voltage"] = measures->core_voltage;
   json["packetnum"] = measures->packetnum;
   json["snr"] = snr;
   json["uuid"] =
@@ -870,11 +866,9 @@ void displayMeasurements(measurements_t* measures, unsigned long lastMessageTime
   unsigned long elapsedTime = (millis() - lastMessageTime) / 1000;
   display.printf("Last: %02lu:%02lu:%02lu\n", elapsedTime / 3600, (elapsedTime % 3600) / 60, elapsedTime % 60);
   display.printf("%s\n",LastPublish.c_str());
-  
   display.printf("Dist: %ldmm\n", measures->distance, measures->duration);
   display.printf("Bat:%.2fV Raw:%lu\n", measures->bat_voltage, measures->rawVbat);
   display.printf("T:%.1fC IT:%.1fC\n", measures->temperature, measures->internal_temp);
-  display.printf("IV:%.2fV CV:%.2fV\n", measures->internal_voltage, measures->core_voltage);
   display.printf("Pkt#: %d SNR: %ddB\n", measures->packetnum, snr);
   display.display();
 }

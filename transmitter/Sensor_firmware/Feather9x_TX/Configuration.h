@@ -41,12 +41,9 @@
 #define SLEEP_TIME_DEBUGGING_SEC 30
 
 
-// time (ms) to stay awake after sending data
-#define KEEP_AWAKE_TOTAL_TIME_MS 5 * 1000
-
 // Sleep time when battery level is sufficient to wake up and
 // take measurements
-#define SLEEP_TIME_REGULAR_SECONDS 15*60*60
+#define SLEEP_TIME_REGULAR_SECONDS 15*60
 
 
 
@@ -123,13 +120,8 @@
 
 
 // Define the address in SRAM for triple-tap detection
-#define TRIPLE_TAP_ADDRESS           (0x20007FF0ul)
-#define TRIPLE_TAP_DATA              (*((volatile uint32_t *) TRIPLE_TAP_ADDRESS))
-#define TRIPLE_TAP_MAGIC             0x07738136  
-#define TAP_TIMEOUT                  2000        
 #define SCALE_ADDRESS                0
 #define WRITTEN_SIGNATURE            0xBEEFDEED
 #define DISTANCE_FROM_PULSE_MM(pulse_width,scale_us_per_cm) ((uint32_t)((double)pulse_width / scale_us_per_cm) * 10)
-
-
+#define BOOT_WAIT_FOR_SERIAL_MS      2000
 

@@ -36,6 +36,7 @@
  * Prerequisite libraries to be installed:
  *   Arduino Low Power by Adruino, >= v1.2.2 
  *   RadioHead  by Mike McCauley, >= v1.122.1 
+ *   Internal Temperature Zero Library by Electronic Cats, >=1.2.0
  * 
  * Board manager:
  *   Adafruit Feather M0 (SAMD21) 
@@ -63,28 +64,13 @@
 #include <SPI.h>
 #include <LoraEncoder.h>
 #include <FlashStorage_SAMD.h>
+#include <TemperatureZero.h>
 
-// #ifdef SERIAL_OFF
-// #include <Analog2DigitalConverter.h>
-// #include <System.h>
-// #include <TimerCounter.h>
-// using namespace SAMD21LPE;
-// Analog2DigitalConverter& adcTemperature = Analog2DigitalConverter::instance();
-// Analog2DigitalConverter& adcVoltage = Analog2DigitalConverter::instance();
-// Analog2DigitalConverter& adcInternalVoltage = Analog2DigitalConverter::instance();
-// Analog2DigitalConverter& adcInternalTemp = Analog2DigitalConverter::instance();
-// const byte GCLKGEN_ID_1K = 6;
-// const byte GCLKGEN_ID_ADC_1MHz = 4;
-// #define GCLKGEN_ID_ADC_1MHz_FREQ 1000000
-// TimerCounter timer;
-// #endif
-
-
-globals_t ctx = { { 0, 0, 0.0f, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0 }, false, 0, 0, false, false, false, BOD33_SLEEP_MULTIPLIER };
+globals_t ctx = { { 0, 0, 0.0f, 0, 0.0f, 0.0f, 0, 0 }, false, 0, false, false, BOD33_SLEEP_MULTIPLIER };
 
 // Singleton instance of the radio driver
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
-
+TemperatureZero TempZero = TemperatureZero();
 
 
 // Define your reference voltage array
@@ -106,42 +92,24 @@ float vref[] = {
 void read_vbat() {
 
   // if (ctx.next_volt_read < millis()) {
-  Serial.println("Reading VBAT");
+  Serial.println("Read VBAT");
   // throttle voltage reading
 
   pinMode(VBAT_PIN, INPUT);
   pinMode(RS485_POWER, OUTPUT);     // Set RS485_POWER pin as digital input
   digitalWrite(RS485_POWER, HIGH);  // put TMP36 chip on
   wait_ms(100);
-  // #ifdef SERIAL_OFF
-  //   ctx.measures.bat_voltage = adcVoltage.read(g_APinDescription[VBAT_PIN].ulADCChannelNumber);
-
-  //   // ctx.measures.rawVbat = static_cast<uint32_t>(tot_vbat / vbat_reads);
-  //   digitalWrite(RS485_POWER, LOW);  // put TMP36 chip off
-  //                                    // voltage divitor divides by 2
-  //                                    // ctx.measures.bat_voltage =
-  //   //     static_cast<float>(ctx.measures.rawVbat) * 2.0f * 3.3f / 1024.0f;
-
-  //   ctx.measures.internal_voltage = adcInternalVoltage.read(ADC_INPUTCTRL_MUXPOS_BANDGAP_Val);
-  //   adcVoltage.disable();
-  //   ctx.measures.core_voltage = adcInternalVoltage.read(ADC_INPUTCTRL_MUXPOS_SCALEDCOREVCC_Val);
-  //   adcInternalVoltage.disable();
-  // #endif
 
   // #ifndef SERIAL_OFF
   analogReference(AR_DEFAULT);
   ctx.measures.bat_voltage = (float)analogRead(VBAT_PIN) * 2.0f * 3.3f / 1024;
   Serial.print("VBAT: ");
   Serial.println(ctx.measures.bat_voltage, 3);
-  Serial.print("CORE V: ");
-  Serial.println(ctx.measures.internal_voltage, 3);
-  Serial.print("INT V: ");
-  Serial.println(ctx.measures.core_voltage, 3);
+  digitalWrite(RS485_POWER, LOW);
+
 
   // #endif
 
-
-  // flash_vbat_value();
   //  todo: fix under power
   //          if (ctx.measures.bat_voltage < VOLTAGE_MIN_THRESHOLD) {
   //              ctx.insufficient_power = true;
@@ -191,36 +159,15 @@ uint64_t readUniqueID64() {
 
 // #endif
 // }
-// void setupClocks() {
-//   // configure low power clock generator
-// #ifdef SERIAL_OFF
-//   // flash_D3(2, 100, 100);
-//   System::setupClockGenOSCULP32K(GCLKGEN_ID_1K, 4);  // 2^(4+1) = 32 -> 1 kHz
-//   System::setupClockGenOSC8M(GCLKGEN_ID_ADC_1MHz, 8, false);
 
-//   // configure timer counter to run at 1 kHz and to continue in standby
-//   // flash_D3(3, 100, 100);
-//   timer.enable(4, GCLKGEN_ID_1K, 1024, TimerCounter::DIV1, TimerCounter::RES16, 1000, true);
-
-//   System::setSleepMode(System::IDLE0);
-//   // select sleep mode STANDBY between ISR calls and enable sleep-on-exit mode
-//   // flash_D3(2, 100, 100);
-//   System::setSleepMode(System::STANDBY);
-//   // flash_D3(3, 100, 100);
-// #endif
-// }
 void wait_ms(uint32_t ms) {
-  // #ifndef SERIAL_OFF
-#pragma message("Can we put to light sleep here?")
-  Serial.println("Delay ");
+#ifdef DEEP_SLEEP_ENABLE
+  LowPower.idle(ms);
+#else
   delay(ms);
-  // #else
-  //   System::setSleepMode(System::IDLE0);
-  //   timer.wait(ms);
-  //   System::setSleepMode(System::STANDBY);
-  // #endif
+#endif
 
-  Serial.println("Done delay");
+  // Serial.println("Done delay");
 }
 void setUsPerCM(double scale) {
   // Save into emulated-EEPROM the number increased by 1 for the next run of the sketch
@@ -233,13 +180,13 @@ void setUsPerCM(double scale) {
     EEPROM.commit();
   }
 }
-double getUsPerCM() {
 
+double getUsPerCM() {
   int signature;
   double result = PULSE_SCALE_MS_PER_CM;
   EEPROM.get(SCALE_ADDRESS, signature);
   if (signature != WRITTEN_SIGNATURE) {
-    Serial.println("EEPROM is empty, Setting default" );
+    Serial.println("EEPROM is empty, Setting default");
     setUsPerCM(PULSE_SCALE_MS_PER_CM);
   } else {
     EEPROM.get(SCALE_ADDRESS + sizeof(WRITTEN_SIGNATURE), result);
@@ -249,51 +196,49 @@ double getUsPerCM() {
 
 
 void checkReset() {
-    unsigned long startTime = millis();
-    pinMode(JP1, INPUT_PULLUP);
-    Serial.print("JP1: ");
-    Serial.println(digitalRead(JP1)==HIGH?"OFF":"ON");
-    while (digitalRead(JP1) == LOW) {  // Wait while the pin is held low
-        if (millis() - startTime > 500) {  // Check if the pin is low for more than 500ms
-            Serial.println("JP1 held low for 500ms, resetting scale value.");
-            setUsPerCM(-1);
-            break;
-        }
+  unsigned long startTime = millis();
+  pinMode(JP1, INPUT_PULLUP);
+  Serial.print("JP1: ");
+  Serial.println(digitalRead(JP1) == HIGH ? "OFF" : "ON");
+  while (digitalRead(JP1) == LOW) {    // Wait while the pin is held low
+    if (millis() - startTime > 500) {  // Check if the pin is low for more than 500ms
+      Serial.println("JP1 held low for 500ms, resetting scale value.");
+      setUsPerCM(-1);
+      break;
     }
-    
+  }
 }
 
 
 void setup() {
-  // flash_D3(7, 100, 100);
-  // #ifndef SERIAL_OFF
-  Serial.begin(19200);
+  flash_D3(7, 100, 100);
   ctx.measures.uuid = readUniqueID64();
+  Serial.begin(19200);
+  auto upto = millis() + BOOT_WAIT_FOR_SERIAL_MS;
+  while (!Serial && millis() < upto) { LowPower.idle(250); }
   checkReset();
+#ifdef SERIAL_OFF
+  System::reducePowerConsumption();
+  System::enablePORT();
+  noInterrupts();
+  System::enableEIC();
+  interrupts();
+#else
   Serial.print("Starting sensor. UUID: ");
   Serial.println(bytesToHexString((uint8_t*)&ctx.measures.uuid, sizeof(ctx.measures.uuid) / sizeof(uint8_t)));
-  // while (!Serial) {
-  // }
-  // #endif
-  //   Serial.print(F("SYST: "));
-  //   Serial.println(PM->RCAUSE.bit.SYST);   // System (software) reset
-  //   Serial.print(F("WDT: "));
-  //   Serial.println(PM->RCAUSE.reg & PM_RCAUSE_WDT);   // Watchdog timer reset (use of WDT
-  //   bit causes compilation error) Serial.print(F("EXT: "));
-  //   Serial.println(PM->RCAUSE.bit.EXT);    // External (reset button) reset
-  //   Serial.print(F("POR: ")); Serial.println(PM->RCAUSE.bit.POR); // Power-on reset
-  //   Serial.println();
-  // #ifdef SERIAL_OFF
-  //   System::reducePowerConsumption();
-  //   System::enablePORT();
-  //   noInterrupts();
-  //   System::enableEIC();
-  //   interrupts();
-  //   // setupClocks();
-  //   // setupADC();
-  // #endif
-  // set_gpios(true);
-  // disable non essential MCU modules (incl. USB)
+  Serial.print(F("SYST: "));
+  Serial.println(PM->RCAUSE.bit.SYST);  // System (software) reset
+  Serial.print(F("WDT: "));
+  Serial.println(PM->RCAUSE.reg & PM_RCAUSE_WDT);  // Watchdog timer reset (use of WDT bit causes compilation error)
+  Serial.print(F("EXT: "));
+  Serial.println(PM->RCAUSE.bit.EXT);  // External (reset button) reset
+  Serial.print(F("POR: "));
+  Serial.println(PM->RCAUSE.bit.POR);  // Power-on reset
+  Serial.println();
+#endif
+  // init radio and put it to sleep
+  init_radio(true);
+  set_gpios(true);
 
   // todo: fix Brown out
   // if (PM->RCAUSE.reg & PM_RCAUSE_BOD33) {
@@ -304,10 +249,7 @@ void setup() {
   //     // reset sleep multiplier
   //     ctx.bod_sleep_remain = BOD33_SLEEP_MULTIPLIER;
   // }
-  // read_distance();
 
-  // init radio and put it to sleep
-  init_radio(true);
   // todo: fix brownout
   // set_brownout(false, SYSCTRL_BOD33_LEVEL_3V07);
 
@@ -319,9 +261,8 @@ void setup() {
   // activate brownout so it resets the system if a power
   // surge pushes the voltage below a certain value
 
-  // todo: fix brownout
+#pragma message("todo: fix brownout")
   // set_brownout(true, SYSCTRL_BOD33_LEVEL_3V07);
-  ctx.keep_awake_until = millis() + KEEP_AWAKE_TOTAL_TIME_MS;
 }
 
 void loop() {
@@ -330,14 +271,13 @@ void loop() {
   read_distance();
   if (!ctx.insufficient_power && !ctx.measures_sent) {
     // flash_D3(4, 200, 50);
-
     send_data();
     // flash_D3(5, 200, 50);
   }
   // todo: fix under voltage behavior
   // if (ctx.insufficient_power) {
   //     do_sleep(SLEEP_TIME_LOW_POWER_MS);
-  // } else if (isBoardReadyToSleep()) {
+  // } else  {
   //     do_sleep(SLEEP_TIME_REGULAR_MS);
   // }
   // flash_D3(6, 100, 100);
@@ -345,7 +285,7 @@ void loop() {
   // todo: fix under voltage behavior
   // if (ctx.insufficient_power) {
   //     do_sleep(SLEEP_TIME_LOW_POWER_MS);
-  // } else if (isBoardReadyToSleep()) {
+  // } else {
   do_sleep(SLEEP_TIME_SEC * 1000);
 }
 
@@ -414,70 +354,44 @@ void do_sleep(int sleep_time) {
   Serial.print(sleep_time);
   Serial.println("ms");
   Serial.flush();
-
-
-  LowPower.deepSleep(sleep_time);  // 5000 = 5 Secondes
-                                   // #else
-                                   //   timer.wait(sleep_time);
-                                   // #endif
-  // Re-enable USB (should never get there because no wakeup interrupt is configured)
+  LowPower.deepSleep(sleep_time);
   Serial.println("Waking up from sleep");
   set_gpios(true);
   init_radio(true);
-  // don't bring back serial
   Serial.println("Done sleeping");
-
-
 #else
   Serial.printf("Sleep disabled. Pausing for %ums", sleep_time);
   Serial.println("\n\n\n===============");
   delay(sleep_time);
 #endif
+
   // flash_D3(8, 100, 100);
   ctx.next_volt_read = 0;
   ctx.measures_sent = false;
 }
 
-bool isBoardReadyToSleep() {
-
-  if (!ctx.first_boot_complete && millis() > ctx.keep_awake_until) {
-    ctx.first_boot_complete = true;
-    Serial.println("Board Initialized");
-  }
-  return ctx.first_boot_complete;
-}
 
 /************************************************************
  * Utilities
  ************************************************************/
 void flash_power(int pin, int times, int on_time, int ratio_pct, bool invert) {
-
   int state = digitalRead(pin);
   pinMode(pin, OUTPUT);
   digitalWrite(pin, invert ? HIGH : LOW);
   delay(700);
   for (int i = 0; i < times; i++) {
     digitalWrite(pin, invert ? LOW : HIGH);  // put TMP36 chip on
-    // LowPower.idle((on_time);
-    delay(on_time);
+    LowPower.idle((uint32_t)on_time);
     digitalWrite(pin, invert ? HIGH : LOW);  // put TMP36 chip on
-    delay(on_time * ratio_pct / 100);
-
-    // LowPower.idle((on_time*ratio_pct/100);
+    LowPower.idle((uint32_t)on_time * ratio_pct / 100);
   }
-  delay(on_time * 1.5);
-  // digitalWrite(pin, state);
+  LowPower.idle((uint32_t)(on_time * 1.5));
+  digitalWrite(pin, state);
 }
+
 void flash_D3(int times, int on_time, int ratio_pct, bool invert) {
   flash_power(RS485_POWER, times, on_time, ratio_pct, false);
 }
-// void flash_vbat_value() {
-//     flash_D3(1, 1500, 0);
-//     flash_D3(trunc(ctx.measures.bat_voltage), 500, 100, false);
-//     flash_D3(
-//         (int)((ctx.measures.bat_voltage - trunc(ctx.measures.bat_voltage)) * 10), 500, 50, false);
-//     flash_D3(1, 1500, 0);
-// }
 
 /************************************************************
  * Peripheral config
@@ -488,18 +402,15 @@ bool init_radio(bool enable) {
   if (enable && !initialized) {
     initialized = true;
     Serial.println("Activating radio power and resetting");
-    Serial.flush();
     pinMode(RFM95_RST, INPUT);
     digitalWrite(RFM95_RST, HIGH);
     wait_ms(100);
-
     // manual reset
     digitalWrite(RFM95_RST, LOW);
     wait_ms(10);
     digitalWrite(RFM95_RST, HIGH);
     wait_ms(10);
     Serial.println("calling init");
-    Serial.flush();
     rf95.init();
     rf95.setFrequency(RF95_FREQ);
     rf95.setTxPower(23, false);
@@ -512,9 +423,7 @@ bool init_radio(bool enable) {
       RH_RF95_REG_40_DIO_MAPPING1, RH_RF95_REG_40_DIO_1(RH_RF95_REG_40_DIO_1_DISABLE) | RH_RF95_REG_40_DIO_2(RH_RF95_REG_40_DIO_2_DISABLE) | RH_RF95_REG_40_DIO_3(RH_RF95_REG_40_DIO_3_DISABLE));
     Serial.println("Putting radio to sleep");
     Serial.flush();
-
     rf95.sleep();
-    // rf95.setModemConfig(RH_RF95::Bw125Cr45Sf128);  //fast burst but low range
     Serial.println("Done Initializing Radio");
   } else if (!enable && initialized) {
     initialized = false;
@@ -633,20 +542,11 @@ void read_temperature() {
 
   wait_ms(10);
   ctx.measures.temperature = (((float)analogRead(TEMP_READ) * 3.3f / 1024.0f) - 0.5f) * 100.0f;
-  //   #ifdef SERIAL_OFF
-  //   ctx.measures.temperature = adcTemperature.read(g_APinDescription[TEMP_READ].ulADCChannelNumber);
-  //   // ctx.measures.temperature = analogRead(TEMP_READ);
-  //   // ctx.measures.temperature *= 3.3;  // Multiply by 3.3V, our reference voltage
-  //   // ctx.measures.temperature /= 1024; // convert to voltage
-  //   ctx.measures.temperature = (ctx.measures.temperature - 0.50) * 100;  // convert to temperature
-  //   adcTemperature.disable();
-
-  //   ctx.measures.internal_temp = adcInternalTemp.read(ADC_INPUTCTRL_MUXPOS_TEMP_Val);
-  //   adcInternalTemp.disable();
-  // #endif
-  //    temperature = 500;
+  TempZero.init();
+  LowPower.idle(500);
+  ctx.measures.internal_temp = TempZero.readInternalTemperature();
+  TempZero.disable();            //saves ~60uA in standby
   digitalWrite(TEMP_SHDN, LOW);  // put TMP36 chip off
-  // flash_D3(8, 100, 50);
 
   Serial.print("TEMP: ");
   Serial.print(ctx.measures.temperature, 2);

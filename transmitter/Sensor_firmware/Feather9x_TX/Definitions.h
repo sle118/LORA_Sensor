@@ -40,8 +40,6 @@ typedef struct __attribute__((packed)) {
   uint32_t rawVbat;
   float temperature;
   float internal_temp;
-  float internal_voltage;
-  float core_voltage;
   int16_t packetnum;
   uint64_t uuid;
 } measurements_t;
@@ -49,9 +47,7 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
     measurements_t measures;
     bool insufficient_power;
-    unsigned long keep_awake_until;
     unsigned long next_volt_read;
-    bool first_boot_complete;
     bool gpios_enabled;
     bool measures_sent;
     uint16_t bod_sleep_remain;
